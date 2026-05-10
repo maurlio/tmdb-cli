@@ -1,0 +1,15 @@
+# Arquivos de build e binários
+build/
+tmdb-cli
+*.o
+*.out
+
+# macOS / Linux / IDEs
+.DS_Store
+.vscode/
+.idea/
+*.swp
+compile_commands.json
+
+# Arquivos de configuração e ambiente
+.env

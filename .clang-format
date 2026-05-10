@@ -1,0 +1,45 @@
+---
+# Indentação e Alinhamento
+UseTab: Never
+TabWidth: 4
+IndentWidth: 4
+ContinuationIndentWidth: 4
+IndentCaseLabels: false
+AccessModifierOffset: -4
+
+AlignAfterOpenBracket: DontAlign
+AlignOperands: true
+AlignTrailingComments: false
+
+# Ponteiros e Espaçamento
+DerivePointerAlignment: false
+PointerAlignment: Right
+SpaceBeforeParens: ControlStatements
+SpaceAfterCStyleCast: false
+SpaceBeforeAssignmentOperators: true
+
+# Quebra de Linhas e Limites
+ColumnLimit: 80
+MaxEmptyLinesToKeep: 1
+
+BinPackArguments: false
+BinPackParameters: false
+
+# Estilo de Chaves
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass: false
+  AfterControlStatement: false
+  AfterEnum: false
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: false
+  AfterUnion: false
+  BeforeCatch: false
+  BeforeElse: false
+  IndentBraces: false
+
+# Inclusões (Headers)
+SortIncludes: false
+IncludeBlocks: Preserve
+...
