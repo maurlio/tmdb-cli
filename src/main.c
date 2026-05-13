@@ -1,3 +1,4 @@
+#include "api.h"
 #include "cli.h"
 #include "common.h"
 #include "http.h"
@@ -24,20 +25,7 @@ int main(int argc, char **argv)
         return SUCCESS;
     }
 
-    // -- Bloco de teste HTTP --
-
-    printf("Iniciando teste HTTP...\n");
-    http_response_t response = {0};
-
-    const char *test_url = "https://github.com/";
-
-    if (http_get(test_url, NULL, &response) == SUCCESS) {
-        printf("Resposta HTTP recebida com sucesso. Tamanho: %zu bytes\n",
-            response.size);
-        http_response_free(&response);
-    }
-
-    // -- Fim do bloco de teste HTTP --
+    status = api_fetch_and_print_movies(args.category);
 
     http_cleanup();
     return SUCCESS;
