@@ -44,6 +44,7 @@ status_code_t http_get(
     CURL *curl_handle;
     CURLcode res;
     struct curl_slist *headers = NULL;
+    status_code_t status = SUCCESS;
 
     out_response->data = malloc(1);
     if (out_response->data == NULL) {
@@ -66,9 +67,10 @@ status_code_t http_get(
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_callback);
     curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void *)out_response);
     curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION, 1L);
+    curl_easy_setopt(curl_handle, CURLOPT_TIMEOUT, 15L);
 
     if (auth_token) {
-        char auth_header[256];
+        char auth_header[1024];
         snprintf(auth_header,
             sizeof(auth_header),
             "Authorization: Bearer %s",
@@ -85,9 +87,33 @@ status_code_t http_get(
             curl_easy_strerror(res));
         http_response_free(out_response);
         return ERROR_NETWORK;
+        goto cleanup;
     }
 
-    return SUCCESS;
+    long http_code = 0;
+    curl_easy_getinfo(curl_handle, CURLINFO_RESPONSE_CODE, &http_code);
+
+    if (http_code >= 400) {
+        LOG_ERROR("Falha na resposta do servidor TMDB (HTTP %ld)", http_code);
+        LOG_ERROR("Resposta do servidor: %s", out_response->data);
+        status = ERROR_NETWORK;
+        goto cleanup;
+    }
+
+cleanup:
+    if (headers) {
+        curl_slist_free_all(headers);
+    }
+
+    if (curl_handle) {
+        curl_easy_cleanup(curl_handle);
+    }
+
+    if (status != SUCCESS) {
+        http_response_free(out_response);
+    }
+
+    return status;
 }
 
 void http_response_free(http_response_t *response)
