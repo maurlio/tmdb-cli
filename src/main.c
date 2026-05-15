@@ -2,10 +2,12 @@
 #include "cli.h"
 #include "common.h"
 #include "http.h"
+#include "view.h"
 
 int main(int argc, char **argv)
 {
     cli_args_t args = {0};
+    movie_list_t movies = {0};
 
     if (http_init() != SUCCESS) {
         return ERROR_NETWORK;
@@ -25,8 +27,17 @@ int main(int argc, char **argv)
         return SUCCESS;
     }
 
-    status = api_fetch_and_print_movies(args.category);
+    status = api_get_movies(args.category, &movies);
 
+    if (status == SUCCESS) {
+        view_print_movie_list(&movies);
+    } else {
+        fprintf(
+            stderr, "Erro ao buscar filmes. Verifique sua chave e conexão.\n");
+    }
+
+    api_free_movie_list(&movies);
     http_cleanup();
-    return SUCCESS;
+
+    return status;
 }

@@ -3,14 +3,21 @@
 
 #include "cli.h"
 #include "common.h"
+#include "models.h"
 
 /**
- * Busca filmes da TMDB com base na categoria e imprime os resultados.
- * @param category A categoria de filmes a ser buscada (ex: CATEGORY_PLAYING,
- * CATEGORY_POPULAR, etc.).
- * @return status_code_t indicando o resultado da operação (SUCCESS,
- * ERROR_GENERIC, etc.).
+ * Função para obter a lista de filmes de uma categoria específica
+ * @param category: categoria de filmes a ser obtida
+ * @param out_list: ponteiro para a estrutura onde a lista de filmes será
+ * armazenada
+ * @return: código de status indicando o resultado da operação
  */
-status_code_t api_fetch_and_print_movies(tmdb_category_t category);
+status_code_t api_get_movies(tmdb_category_t category, movie_list_t *out_list);
+
+/**
+ * Função para liberar a memória alocada para a lista de filmes
+ * @param list: ponteiro para a estrutura da lista de filmes a ser liberada
+ */
+void api_free_movie_list(movie_list_t *list);
 
 #endif
