@@ -16,9 +16,8 @@ void view_print_movie_list(const movie_list_t *list)
                                ? list->items[i].release_date
                                : "Sem data";
 
-        printf("%zu. [%d] %s (%s) - Nota: %.1f\n",
+        printf("%zu. %s (%s) - Nota: %.1f\n",
             i + 1,
-            list->items[i].id,
             list->items[i].title,
             date,
             list->items[i].rating);
