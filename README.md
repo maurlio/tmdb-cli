@@ -1,6 +1,8 @@
 # TMDB-CLI
 
-Aplicação de linha de comando em C para consultar filmes utilizando a API do The Movie Database (TMDB).
+Uma aplicação de linha de comando (CLI) desenvolvida em C que permite consultar informações sobre filmes diretamente do terminal, consumindo a API oficial do The Movie Database (TMDB).
+
+Este projeto foi desenvolvido como solução ao desafio [TMDB CLI Tool](https://roadmap.sh/projects/tmdb-cli) da plataforma **Roadmap.sh**.
 
 ## Funcionalidades
 
