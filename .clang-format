@@ -40,6 +40,6 @@ BraceWrapping:
   IndentBraces: false
 
 # Inclusões (Headers)
-SortIncludes: false
+SortIncludes: true
 IncludeBlocks: Preserve
 ...

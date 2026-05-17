@@ -1,6 +1,6 @@
 # Compilador e flags
 CC = gcc
-CFLAGS = -std=c17 -Wall -Wextra -pedantic -Werror -I./include
+CFLAGS = -std=c17 -Wall -Wextra -pedantic -Werror -I./include -MMD -MP
 LDFLAGS = -lcurl -lcjson
 
 # Diretórios
@@ -11,6 +11,7 @@ BUILD_DIR = build
 # Arquivos
 SRCS = $(wildcard $(SRC_DIR)/*.c)
 OBJS = $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRCS))
+DEPS = $(OBJS:.o=.d)
 TARGET = tmdb-cli
 
 # Target padrão
@@ -37,10 +38,13 @@ sanitizer: clean $(TARGET)
 $(TARGET): $(OBJS)
 	$(CC) $(OBJS) -o $@ $(LDFLAGS)
 
-# Compilação dos objetos (Gera os .o na pasta build)
+# Compilação dos objetos e geração de dependências
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
+
+# Inclui as regras de dependência geradas pelo GCC
+-include $(DEPS)
 
 # Formatação de código
 .PHONY: format
