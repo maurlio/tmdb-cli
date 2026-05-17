@@ -2,29 +2,32 @@
 #include <string.h>
 
 /**
- * Converte uma string de categoria em um valor do enum tmdb_category_t.
- * @param str: String representando a categoria.
- * @return: Valor do enum tmdb_category_t correspondente à string, ou
- * CATEGORY_UNKNOWN se a string não for reconhecida.
+ * Converte a string de forma segura para o enum oficial da API.
+ * @param str: String de entrada.
+ * @param out_cat: Ponteiro para armazenar o resultado.
+ * @return: true se a conversão foi bem-sucedida, false caso contrário.
  */
-static tmdb_category_t parse_category_string(const char *str)
+static bool parse_category_string(const char *str, tmdb_category_t *out_cat)
 {
     if (strcmp(str, "playing") == 0) {
-        return CATEGORY_PLAYING;
+        *out_cat = CATEGORY_PLAYING;
+        return true;
     } else if (strcmp(str, "popular") == 0) {
-        return CATEGORY_POPULAR;
+        *out_cat = CATEGORY_POPULAR;
+        return true;
     } else if (strcmp(str, "top") == 0) {
-        return CATEGORY_TOP;
+        *out_cat = CATEGORY_TOP;
+        return true;
     } else if (strcmp(str, "upcoming") == 0) {
-        return CATEGORY_UPCOMING;
+        *out_cat = CATEGORY_UPCOMING;
+        return true;
     }
-
-    return CATEGORY_UNKNOWN;
+    return false;
 }
 
 status_code_t cli_parse_args(int argc, char **argv, cli_args_t *out_args)
 {
-    out_args->category = CATEGORY_UNKNOWN;
+    out_args->has_category = false;
     out_args->help = false;
 
     if (argc == 1) {
@@ -39,11 +42,11 @@ status_code_t cli_parse_args(int argc, char **argv, cli_args_t *out_args)
         } else if (strcmp(argv[i], "--type") == 0 ||
                    strcmp(argv[i], "-t") == 0) {
             if (i + 1 < argc) {
-                out_args->category = parse_category_string(argv[i + 1]);
-                if (out_args->category == CATEGORY_UNKNOWN) {
+                if (!parse_category_string(argv[i + 1], &out_args->category)) {
                     LOG_ERROR("Categoria invalida: %s", argv[i + 1]);
                     return ERROR_INVALID_ARGS;
                 }
+                out_args->has_category = true;
                 i++;
             } else {
                 LOG_ERROR("Falta valor para o argumento --type.");
@@ -55,7 +58,7 @@ status_code_t cli_parse_args(int argc, char **argv, cli_args_t *out_args)
         }
     }
 
-    if (out_args->category == CATEGORY_UNKNOWN && !out_args->help) {
+    if (!out_args->has_category && !out_args->help) {
         LOG_ERROR("Use --type para especificar uma categoria.");
         return ERROR_INVALID_ARGS;
     }
@@ -67,9 +70,7 @@ void cli_print_help(const char *prog_name)
 {
     printf("Uso: %s [OPÇÕES]\n", prog_name);
     printf("Opções:\n");
-    printf("  -t, --type <categoria>   Especifica a categoria de filmes a "
-           "consultar.\n");
-    printf("                           Categorias válidas: playing, popular, "
-           "top, upcoming\n");
-    printf("  -h, --help               Exibe esta mensagem de ajuda.\n");
+    printf("  -t, --type <categoria>   Especifica a categoria de filmes.\n");
+    printf("                           (playing, popular, top, upcoming)\n");
+    printf("  -h, --help               Mostra esta mensagem de ajuda.\n");
 }
