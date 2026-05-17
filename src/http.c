@@ -3,17 +3,28 @@
 #include <stdlib.h>
 #include <string.h>
 
+/**
+ * Callback para escrever os dados recebidos da resposta HTTP.
+ * @param contents Ponteiro para os dados recebidos.
+ * @param size Tamanho de cada elemento (geralmente 1 byte).
+ * @param nmemb Número de elementos (tamanho total dos dados é size * nmemb).
+ * @param userp Ponteiro onde os dados devem ser armazenados.
+ * @return O número total de bytes processados (size * nmemb) ou 0 em caso de
+ * erro.
+ */
 static size_t write_callback(
     void *contents, size_t size, size_t nmemb, void *userp)
 {
     size_t total_size = size * nmemb;
     http_response_t *mem = (http_response_t *)userp;
 
-    // Realoca a memória para armazenar os dados recebidos
+    /* Realoca a memória para acomodar os novos dados recebidos.
+     * Se falhar, realloc retorna NULL mas o ponteiro original (mem->data)
+     * permanece intocado, prevenindo double-frees. */
     char *ptr = realloc(mem->data, mem->size + total_size + 1);
     if (ptr == NULL) {
         LOG_ERROR("Falha ao reservar memória para o download HTTP.");
-        return 0;
+        return 0; /* Retornar 0 força o curl_easy_perform a abortar */
     }
 
     mem->data = ptr;
@@ -41,10 +52,14 @@ void http_cleanup(void) { curl_global_cleanup(); }
 status_code_t http_get(
     const char *url, const char *auth_token, http_response_t *out_response)
 {
-    CURL *curl_handle;
+    CURL *curl_handle = NULL;
     CURLcode res;
     struct curl_slist *headers = NULL;
     status_code_t status = SUCCESS;
+
+    if (!url || !out_response) {
+        return ERROR_INVALID_ARGS;
+    }
 
     out_response->data = malloc(1);
     if (out_response->data == NULL) {
@@ -58,11 +73,11 @@ status_code_t http_get(
     curl_handle = curl_easy_init();
     if (!curl_handle) {
         LOG_ERROR("Falha ao criar a sessão da libcurl.");
-        http_response_free(out_response);
-        return ERROR_NETWORK;
+        status = ERROR_NETWORK;
+        goto cleanup;
     }
 
-    // Configura as opções da requisição HTTP (URL e callbacks)
+    /* Configura as opções da requisição HTTP */
     curl_easy_setopt(curl_handle, CURLOPT_URL, url);
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_callback);
     curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void *)out_response);
@@ -71,6 +86,8 @@ status_code_t http_get(
 
     if (auth_token) {
         char auth_header[1024];
+        /* snprintf garante que não haverá buffer overflow mesmo com tokens
+         * imensos */
         snprintf(auth_header,
             sizeof(auth_header),
             "Authorization: Bearer %s",
@@ -85,8 +102,7 @@ status_code_t http_get(
     if (res != CURLE_OK) {
         LOG_ERROR("Não foi possível concluir a requisição HTTP: %s",
             curl_easy_strerror(res));
-        http_response_free(out_response);
-        return ERROR_NETWORK;
+        status = ERROR_NETWORK;
         goto cleanup;
     }
 
@@ -119,7 +135,9 @@ cleanup:
 void http_response_free(http_response_t *response)
 {
     if (response != NULL) {
-        free(response->data);
+        if (response->data != NULL) {
+            free(response->data);
+        }
         response->data = NULL;
         response->size = 0;
     }
