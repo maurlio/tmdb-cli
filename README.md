@@ -1,66 +1,68 @@
+> English | [Português](README.pt-BR.md)
+
 # TMDB-CLI
 
-Uma aplicação de linha de comando (CLI) desenvolvida em C que permite consultar informações sobre filmes diretamente do terminal, consumindo a API oficial do The Movie Database (TMDB).
+A command-line interface (CLI) application developed in C that allows querying movie information directly from the terminal, consuming the official The Movie Database (TMDB) API.
 
-Este projeto foi desenvolvido como solução ao desafio [TMDB CLI Tool](https://roadmap.sh/projects/tmdb-cli) da plataforma **Roadmap.sh**.
+This project was developed as a solution to the [TMDB CLI Tool](https://roadmap.sh/projects/tmdb-cli) challenge from the **Roadmap.sh** platform.
 
-## Funcionalidades
+## Features
 
-* Consulta de filmes por categoria: `playing`, `popular`, `top` e `upcoming`
-* Exibição de ID, título, data de lançamento e nota média
-* Tratamento de erros de rede, parsing JSON e entradas inválidas
+* Query movies by category: `playing`, `popular`, `top`, and `upcoming`
+* Display of ID, title, release date, and average rating
+* Error handling for network issues, JSON parsing, and invalid inputs
 
-## Dependências
+## Dependencies
 
-O projeto foi desenvolvido em conformidade com o padrão C17, mantendo total retrocompatibilidade com C11. Para realizar a compilação, é necessário ter instalados o gcc, o make e as seguintes bibliotecas de desenvolvimento:
+The project was developed in compliance with the C17 standard, maintaining full backward compatibility with C11. To compile the project, you must have gcc, make, and the following development libraries installed:
 
 * `libcurl`
 * `cJSON`
 
-## Compilação
+## Building
 
-O projeto utiliza um Makefile configurado com rastreamento automático de dependências de headers (-MMD -MP) e flags de compilação rigorosas (-Wall -Wextra -pedantic -Werror).
+The project utilizes a Makefile configured with automatic header dependency tracking (-MMD -MP) and strict compilation flags (-Wall -Wextra -pedantic -Werror).
 
 ```bash
-make            # Build de produção
-make debug      # Build com símbolos de debug
-make sanitizer  # Build com Address Sanitizer
-make clean      # Remove artefatos de compilação
-make format     # Formata o código com clang-format
+make            # Production build
+make debug      # Build with debug symbols
+make sanitizer  # Build with Address Sanitizer
+make clean      # Remove compilation artifacts
+make format     # Format code with clang-format
 ```
 
-## Uso
+## Usage
 
-Antes de executar, é obrigatório fornecer o seu token de acesso da API do TMDB através de uma variável de ambiente.
+Before running the application, you must provide your TMDB API access token via an environment variable.
 
 ```bash
-# 1. Exporte a sua chave da API
-export TMDB_API_KEY="seu_token_de_acesso_aqui"
+# 1. Export your API key
+export TMDB_API_KEY="your_access_token_here"
 
-# 2. Execute o programa solicitando uma categoria
+# 2. Run the program requesting a category
 ./tmdb-cli --type popular
 ```
 
-## Argumentos Suportados
+## Supported Arguments
 
 ```text
--t, --type <categoria>   playing | popular | top | upcoming
--h, --help               ajuda
+-t, --type <category>   playing | popular | top | upcoming
+-h, --help               help
 ```
 
-## Estrutura do Projeto
+## Project Structure
 
-O código foi organizado em camadas com responsabilidade única, priorizando baixo acoplamento, separação clara de responsabilidades e facilidade de manutenção:
+The code is organized into single-responsibility layers, prioritizing low coupling, a clear separation of concerns, and ease of maintenance:
 
 ```text
-cli.*      Parser de argumentos e fluxo principal
-api.*      Integração com a API do TMDB
-http.*     Wrapper sobre libcurl
-view.*     Renderização no terminal
-models.h   Estruturas de dados
-common.h   Utilitários e macros
+cli.*       Argument parser and main flow
+api.*       Integration with the TMDB API
+http.*      Wrapper over libcurl
+view.*      Terminal rendering
+models.h    Data structures
+common.h    Utilities and macros
 ```
 
-## Licença
+## License
 
-Este projeto é distribuído sob os termos da Licença MIT.
+This project is distributed under the terms of the MIT License.
